@@ -56,6 +56,11 @@
 #include "netif/ppp/pppoe.h"
 #endif /* PPPOE_SUPPORT */
 
+#include "py/mpconfig.h"
+#if MICROPY_PY_URAWETHERNET
+#include "usermod/urawethernet/modurawethernet.h"
+#endif
+
 #ifdef LWIP_HOOK_FILENAME
 #include LWIP_HOOK_FILENAME
 #endif
@@ -230,6 +235,26 @@ ethernet_input(struct pbuf *p, struct netif *netif)
       }
       break;
 #endif /* LWIP_IPV6 */
+
+#if MICROPY_PY_URAWETHERNET
+    case PP_HTONS(ETHTYPE_PROFINET): /* PROFINET RT */
+      //DEBUG_printf("\nethernet_input caught a PROFINET packet! calling urawethernet_profinet_input()\n");
+      //printf("\nethernet_input caught a PROFINET packet! calling urawethernet_profinet_input()\n");
+      urawethernet_profinet_input(p, netif);
+      break;
+
+    case PP_HTONS(ETHTYPE_LLDP): /* LLDP */
+      //DEBUG_printf("\nethernet_input caught an LLDP packet! calling urawethernet_LLDP_input()\n");
+      printf("\nethernet_input caught an LLDP packet! calling urawethernet_LLDP_input()\n");
+      urawethernet_LLDP_input(p, netif);
+      break;
+
+    case PP_HTONS(ETHTYPE_VLAN): /* VLAN */
+      // should never happen, should be caught before
+      //DEBUG_printf("\nethernet_input caught a VLAN packet!\n");
+      printf("\nethernet_input caught a VLAN packet!\n");
+      break;
+#endif /* MICROPY_PY_URAWETHERNET */
 
     default:
 #ifdef LWIP_HOOK_UNKNOWN_ETH_PROTOCOL
