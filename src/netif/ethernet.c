@@ -238,22 +238,17 @@ ethernet_input(struct pbuf *p, struct netif *netif)
 
 #if MICROPY_PY_URAWETHERNET
     case PP_HTONS(ETHTYPE_PROFINET): /* PROFINET RT */
-      //DEBUG_printf("\nethernet_input caught a PROFINET packet! calling urawethernet_profinet_input()\n");
-      //printf("\nethernet_input caught a PROFINET packet! calling urawethernet_profinet_input()\n");
-      urawethernet_profinet_input(p, netif);
+      urawethernet_profinet_input(p, netif, next_hdr_offset);
       break;
 
     case PP_HTONS(ETHTYPE_LLDP): /* LLDP */
-      //DEBUG_printf("\nethernet_input caught an LLDP packet! calling urawethernet_LLDP_input()\n");
-      printf("\nethernet_input caught an LLDP packet! calling urawethernet_LLDP_input()\n");
-      urawethernet_LLDP_input(p, netif);
+      urawethernet_LLDP_input(p, netif, next_hdr_offset);
       break;
 
-    case PP_HTONS(ETHTYPE_VLAN): /* VLAN */
-      // should never happen, should be caught before
-      //DEBUG_printf("\nethernet_input caught a VLAN packet!\n");
-      printf("\nethernet_input caught a VLAN packet!\n");
-      break;
+    //case PP_HTONS(ETHTYPE_VLAN): /* VLAN */
+      // should never happen, should be caught before if ETHARP_SUPPORT_VLAN is true
+      //printf("\nethernet_input caught a VLAN packet!\n");
+      //break;
 #endif /* MICROPY_PY_URAWETHERNET */
 
     default:
